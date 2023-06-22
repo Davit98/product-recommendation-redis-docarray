@@ -2,11 +2,16 @@ import functools
 import os
 
 import numpy as np
-from docarray import DocumentArray, Document
 import streamlit as st
+from docarray import DocumentArray, Document
 
 
-@st.cache(persist=True)
+# from dotenv import load_dotenv
+# load_dotenv()
+
+
+
+@st.cache_data
 def load_data():
     da = DocumentArray.pull(os.getenv('DATASET_NAME', 'amazon-berkeley-objects-dataset-encoded'), show_progress=True)
     colors = [None] + list({doc.tags['color'] for doc in da})
@@ -15,12 +20,14 @@ def load_data():
     max_width = max({int(doc.tags['width']) for doc in da})
     max_height = max({int(doc.tags['height']) for doc in da})
     redis_da = DocumentArray(storage='redis', config={
-        # uncomment if you're using Redis cloud
-        # 'host': 'host',
-        # 'port': 'port',
+        # for Redis cloud
+        # 'host': 'redis-13273.c266.us-east-1-3.ec2.cloud.redislabs.com',
+        # 'port': 13273,
         # 'redis_config': {
-        #     'password': 'password'
+        #     'password': os.getenv('REDIS_PASSWORD')
         # },
+        'host': 'localhost',
+        'port': 6379,
         'n_dim': 768,
         'columns': {
             'color': 'str',
@@ -29,14 +36,15 @@ def load_data():
             'width': 'int',
             'height': 'int',
             'brand': 'str',
-        }, 'tag_indices': ['item_name']
+        },
+        'tag_indices': ['item_name']
     })
     redis_da.extend(da)
     return redis_da, colors, categories, countries, max_width, max_height
 
 
-def recommend(view_history, da: DocumentArray, k: int = 10, color=None, category=None, country=None, min_width=None, max_width=None,
-              min_height=None, max_height=None):
+def recommend(view_history, da: DocumentArray, k: int = 8, color=None, category=None, country=None, min_width=None,
+              max_width=None, min_height=None, max_height=None):
     user_filter = ''
     if color:
         user_filter += f'@color:{color} '
@@ -78,8 +86,7 @@ def view(product_id: str, da: DocumentArray):
     del st.session_state['product']
 
 
-
-def set_viewed_product(product: Document, k: int = 10):
+def set_viewed_product(product: Document, k: int = 8):
     st.session_state['product'] = product.id
     view_history = st.session_state.get('view_history', [])
     view_history.insert(0, product)
@@ -87,10 +94,9 @@ def set_viewed_product(product: Document, k: int = 10):
     st.session_state['view_history'] = view_history
 
 
-def view_products(docs, k: int = 10):
+def view_products(docs, k: int = 8):
     columns = st.columns(k)
     for doc, column in zip(docs[:k], columns):
         container = column.container()
         container.button('view', on_click=functools.partial(set_viewed_product, product=doc, k=k), key=doc.id)
         container.image(doc.uri, use_column_width='always')
-

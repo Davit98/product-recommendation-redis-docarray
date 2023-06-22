@@ -1,4 +1,4 @@
-streamlit
-docarray[redis]>=0.18.0
-jina
-clip-client
+streamlit==1.23.1
+docarray[redis]==0.21.0
+jina==3.17.0
+clip-client==0.8.2
