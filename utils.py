@@ -6,11 +6,6 @@ import streamlit as st
 from docarray import DocumentArray, Document
 
 
-# from dotenv import load_dotenv
-# load_dotenv()
-
-
-
 @st.cache_data
 def load_data():
     da = DocumentArray.pull(os.getenv('DATASET_NAME', 'amazon-berkeley-objects-dataset-encoded'), show_progress=True)
@@ -20,13 +15,7 @@ def load_data():
     max_width = max({int(doc.tags['width']) for doc in da})
     max_height = max({int(doc.tags['height']) for doc in da})
     redis_da = DocumentArray(storage='redis', config={
-        # for Redis cloud
-        # 'host': 'redis-13273.c266.us-east-1-3.ec2.cloud.redislabs.com',
-        # 'port': 13273,
-        # 'redis_config': {
-        #     'password': os.getenv('REDIS_PASSWORD')
-        # },
-        'host': 'localhost',
+        'host': 'redis-server',  # change host to `localhost` if running locally, i.e. not with docker compose
         'port': 6379,
         'n_dim': 768,
         'columns': {
