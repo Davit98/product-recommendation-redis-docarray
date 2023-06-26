@@ -3,7 +3,7 @@ This project is a demo of real-time product recommendation using Redis and DocAr
 This real-time recommendation relies on VSS to recommend visually similar products that satisfy a set of user filters.
 Recommendations are based on user session data which consists of weighted average of the last k visited products.
 
-## about the dataset:
+## About the dataset:
 The dataset is derived from the "[Amazon Berkeley Objects Dataset](https://amazon-berkeley-objects.s3.amazonaws.com/index.html)".
 It comes in a DocArray format from Jina Cloud available using the following keys:
 - 'amazon-berkeley-objects-dataset': pre-processed subset of the Amazon Berkeley Objects Dataset in DocArray format.
@@ -18,18 +18,17 @@ instance, by encoding mesh data):
 4. Set the `DATASET_NAME` environment variable before running the application: `export DATASET_NAME=my-da-name`
 
 ## Run the application:
-In order to run the application, make sure to follow these steps:
-1. Make sure to have a running Redis instance with at least RediSearch 2.4 module installed. You can do so using Docker:
-`docker run -d -p 6379:6379 redislabs/redisearch:2.6.0`
-Alternatively, you can create an instance for free on [Redis Cloud](https://redis.com/try-free/).
 
-PS: if you have used a cloud instance, make sure to update the Redis credentials (host, port and password) in `utils.py`.
+### Using Docker Compose
+In order to run the application with Docker Compose, make sure to follow these steps:
+1. Create a personal access token for Jina AI Cloud. You can read how to accomplish that [here](https://docs.jina.ai/jina-ai-cloud/login/).
 
-2. Install dependencies: `pip install -r requirements.txt`
+2. Afterwards, create a `.env` file and keep the personal access token there as an environment variable under the name JINA_AUTH_TOKEN.
 
-3. Login to Jina Cloud: `jina auth login`
-
-4. Run the streamlit application: `streamlit run main.py`
+3. Run `docker-compose up` and access the streamlit application at http://localhost:8501/
+   
+### Running locally
+In order to run the application locally, follow the commands provided in `run.sh` bash script.
 
 ## Demo
 ![](recommendation-demo.gif)
